@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import courseImg from "../assets/courseImg.png";
 import authorImg from "../assets/authorImage.png";
 import { RiVideoFill } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
 import CourseFilterDrawer from "../components/CourseFilterDrawer";
+import { useAuth } from "../context/getApi";
 const courseData = [
   {
     id: 1,
@@ -79,12 +80,20 @@ const courseData = [
   },
 ];
 const Dashboard = () => {
-  const [courses, setCourses] = useState(courseData);
+  const [courses, setCourses] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const handleCourseClick=()=>{
-    setDrawerOpen(true); 
-    
-  }
+  const { fetchCourses } = useAuth();
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchCourses();
+      console.log("the courses are", data?.data?.courses);
+      setCourses(data?.data?.courses);
+    };
+    fetchData();
+  }, []);
+  const handleCourseClick = () => {
+    setDrawerOpen(true);
+  };
   return (
     <section className="md:m-4 p-6 mt-12 rounded-xl bg-white shadow-sm">
       <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
@@ -121,12 +130,16 @@ const Dashboard = () => {
 
       <div className="flex flex-wrap">
         {courses.map((course, i) => (
-          <div key={course.id} className="w-full md:w-1/2 lg:w-1/3 p-4" onClick={handleCourseClick}>
+          <div
+            key={course._id || i}
+            className="w-full md:w-1/2 lg:w-1/3 p-4"
+            onClick={handleCourseClick}
+          >
             <div className="bg-white rounded-2xl hover:bg-[#FE99001A] overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
               {/* Course Image */}
               <div className="h-48 w-full overflow-hidden">
                 <img
-                  src={course.image}
+                  src={course.thumbnail_url}
                   alt={course.title}
                   className="w-full h-full object-cover"
                 />
@@ -134,13 +147,13 @@ const Dashboard = () => {
 
               {/* Bottom Content */}
               <div className="bg-[#FDF5F2] p-4 space-y-3">
-                {/* Top Row: Lessons & Category Tag */}
+                {/* Top Row: Category Tag */}
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-gray-700 font-medium">
                     <span className="bg-green-100 text-green-700 p-1 rounded-full">
                       <RiVideoFill size={20} />
                     </span>
-                    {course.lessons}
+                    {course.level}
                   </div>
                   <span className="bg-[#E5EAFE] text-[#5065D1] px-2 py-1 rounded-md text-xs font-medium">
                     {course.category}
@@ -152,55 +165,53 @@ const Dashboard = () => {
                   {course.title}
                 </h3>
 
-                {/* Author Section */}
+                {/* Instructor Section */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3 mt-2">
                     <img
-                      src={course.authorImage}
-                      alt={course.author}
+                      src={course.instructor_image}
+                      alt={course.instructor_name}
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <div>
                       <p className="text-sm font-medium text-gray-800">
-                        {course.author}
+                        {course.instructor_name}
                       </p>
-                      <p className="text-xs text-gray-500">{course.role}</p>
+                      <p className="text-xs text-gray-500">{course.language}</p>
                     </div>
                   </div>
-                  <div>
+                  <div className="text-right">
                     <p className="text-gray-600 text-xs">
-                      {course.students} Students
+                      ₹{course.discount_price}{" "}
+                      <span className="line-through text-red-400 text-[10px] ml-1">
+                        ₹{course.price}
+                      </span>
                     </p>
                   </div>
                 </div>
 
-
-                {/* Rating and Students */}
-                <div className="flex justify-between items-center ">
-                <div className="flex items-center justify-between text-sm mt-2">
-                  <div className="flex items-center gap-1 text-yellow-500">
-                    {Array.from({ length: Math.floor(course.rating) }).map(
-                      (_, index) => (
-                        <FaStar key={index} />
-                      )
-                    )}
-                    <span className="text-gray-600 ml-1">
-                      ({course.rating})
+                {/* Learn More Button */}
+                <div className="flex justify-between items-center mt-2">
+                  <div>
+                    <span className="text-xs text-gray-500">
+                      Published:{" "}
+                      {new Date(course.published_at).toLocaleDateString()}
                     </span>
                   </div>
-                </div>
-                <div className="pt-2">
                   <button className="px-4 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Learn More
                   </button>
-                </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
-      </div>  
-      <CourseFilterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      </div>
+
+      <CourseFilterDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </section>
   );
 };
