@@ -1,12 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
+import CourseListing from "./pages/CourseListing";
+import AddCourse from "./pages/AddCourse";
 import Settings from "./pages/Settings";
 import { useState } from "react";
 import Login from "./components/Login";
 import { Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import JobManagement from "./pages/JobManagement";
+import JobPage from "./pages/JobPage";
+import CreateJob from "./pages/CreateJob";
+import Addmission from "./pages/Addmission";
+import AdmissionDetails from "./pages/AdmissionDetails";
 
 function Layout({ sidebarOpen, setSidebarOpen }) {
   return (
@@ -39,9 +44,14 @@ function App() {
           <Route
             element={<Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}
           >
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/createCourse" element={<Users />} />
+            <Route path="/" element={<CourseListing />} />
+            <Route path="/createCourse" element={<AddCourse />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/job" element={<JobManagement />} />
+            <Route path="/job/:slug" element={<JobPage />} />
+            <Route path="/createJob" element={<CreateJob />} />
+            <Route path="/admission" element={<Addmission />} />
+            <Route path="/admission/:id" element={<AdmissionDetails />} />
           </Route>
         </Route>
 

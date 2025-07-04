@@ -2,85 +2,16 @@ import { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import courseImg from "../assets/courseImg.png";
 import authorImg from "../assets/authorImage.png";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { RiVideoFill } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
 import CourseFilterDrawer from "../components/CourseFilterDrawer";
 import { useAuth } from "../context/getApi";
-const courseData = [
-  {
-    id: 1,
-    image: courseImg,
-    lessons: "10x Lessons",
-    title: "Career to build for the pro level",
-    category: "Development",
-    author: "Robert Fox",
-    authorImage: authorImg,
-    role: "UI/UX Designer",
-    rating: 4.8,
-    students: "2k",
-  },
-  {
-    id: 2,
-    image: courseImg,
-    lessons: "12x Lessons",
-    title: "Career to build for the pro level",
-    category: "Design",
-    author: "Robert Fox",
-    authorImage: authorImg,
-    role: "Product Designer",
-    rating: 4.9,
-    students: "3k ",
-  },
-  {
-    id: 3,
-    image: courseImg,
-    lessons: "8x Lessons",
-    title: "Career to build for the pro level",
-    category: "Development",
-    author: "Robert Fox",
-    authorImage: authorImg,
-    role: "Fullstack Dev",
-    rating: 4.7,
-    students: "1.5k ",
-  },
-  {
-    id: 4,
-    image: courseImg,
-    lessons: "9x Lessons",
-    title: "Career to build for the pro level",
-    category: "Marketing",
-    author: "Robert Fox",
-    authorImage: authorImg,
-    role: "Content Marketer",
-    rating: 4.6,
-    students: "2.2k ",
-  },
-  {
-    id: 5,
-    image: courseImg,
-    lessons: "11x Lessons",
-    title: "Career to build for the pro level",
-    category: "Development",
-    author: "Robert Fox",
-    role: "Frontend Dev",
-    authorImage: "",
-    rating: 4.9,
-    students: "4.1k ",
-  },
-  {
-    id: 6,
-    image: courseImg,
-    lessons: "10x Lessons",
-    title: "Career to build for the pro level",
-    category: "Design",
-    author: "Robert Fox",
-    role: "Graphics Designer",
-    rating: 5.0,
-    students: "3.5k ",
-  },
-];
-const Dashboard = () => {
+
+const CourseListing = () => {
   const [courses, setCourses] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { fetchCourses } = useAuth();
   useEffect(() => {
@@ -93,6 +24,24 @@ const Dashboard = () => {
   }, []);
   const handleCourseClick = () => {
     setDrawerOpen(true);
+  };
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/courses/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to delete course");
+      }
+      setCourses(courses.filter((course) => course._id !== id));
+      fetchData();
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
   return (
     <section className="md:m-4 p-6 mt-12 rounded-xl bg-white shadow-sm">
@@ -132,10 +81,24 @@ const Dashboard = () => {
         {courses.map((course, i) => (
           <div
             key={course._id || i}
-            className="w-full md:w-1/2 lg:w-1/3 p-4"
-            onClick={handleCourseClick}
+            className="w-full md:w-1/2 lg:w-1/3 p-4 relative"
           >
-            <div className="bg-white rounded-2xl hover:bg-[#FE99001A] overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+            <div
+              className="bg-white rounded-2xl hover:bg-[#FE99001A] overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
+              onClick={() => handleCourseClick(course)}
+            >
+              {/* Delete Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCourseToDelete(course._id);
+                  setShowConfirm(true);
+                }}
+                className="absolute top-4 right-4 z-10 bg-red-100 m-1 text-red-600 hover:bg-red-200 rounded-full p-2"
+              >
+                <RiDeleteBin6Line size={18} />
+              </button>
+
               {/* Course Image */}
               <div className="h-48 w-full overflow-hidden">
                 <img
@@ -147,7 +110,6 @@ const Dashboard = () => {
 
               {/* Bottom Content */}
               <div className="bg-[#FDF5F2] p-4 space-y-3">
-                {/* Top Row: Category Tag */}
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-gray-700 font-medium">
                     <span className="bg-green-100 text-green-700 p-1 rounded-full">
@@ -160,12 +122,10 @@ const Dashboard = () => {
                   </span>
                 </div>
 
-                {/* Course Title */}
                 <h3 className="text-[17px] font-bold text-gray-900 leading-snug">
                   {course.title}
                 </h3>
 
-                {/* Instructor Section */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3 mt-2">
                     <img
@@ -190,14 +150,11 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Learn More Button */}
                 <div className="flex justify-between items-center mt-2">
-                  <div>
-                    <span className="text-xs text-gray-500">
-                      Published:{" "}
-                      {new Date(course.published_at).toLocaleDateString()}
-                    </span>
-                  </div>
+                  <span className="text-xs text-gray-500">
+                    Published:{" "}
+                    {new Date(course.published_at).toLocaleDateString()}
+                  </span>
                   <button className="px-4 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Learn More
                   </button>
@@ -206,6 +163,37 @@ const Dashboard = () => {
             </div>
           </div>
         ))}
+        {showConfirm && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-md w-[90%] max-w-sm">
+              <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+              <p className="mb-6 text-sm text-gray-600">
+                Are you sure you want to delete this course? This action cannot
+                be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded"
+                  onClick={() => {
+                    setShowConfirm(false);
+                    setCourseToDelete(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded"
+                  onClick={() => {
+                    handleDelete(courseToDelete);
+                    setShowConfirm(false);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <CourseFilterDrawer
@@ -216,4 +204,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default CourseListing;

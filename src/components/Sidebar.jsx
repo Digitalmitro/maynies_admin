@@ -86,6 +86,36 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <FaCog className="text-lg" />
             <span>Instructor Dashboard</span>
           </Link>
+          <Link
+            to="/job"
+            className={`
+              flex items-center gap-3 p-3 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/job"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <FaCog className="text-lg" />
+            <span>Job Management</span>
+          </Link>
+          <Link
+            to="/admission"
+            className={`
+              flex items-center gap-3 p-3 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/job"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <FaCog className="text-lg" />
+            <span>Addmission</span>
+          </Link>
         </nav>
       </div>
     </>
