@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
-
+import imageCompression from "browser-image-compression";
+import { useNavigate } from "react-router-dom";
 const CourseCreationForm = () => {
+  const MAX_SIZE_KB = 500;
+  const [uploading, setUploading] = useState(false);
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -29,9 +33,9 @@ const CourseCreationForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-  
+
     let newValue = type === "checkbox" ? checked : value;
-  
+
     // Convert to number if the input type is number and value isn't empty
     if (type === "number" && value !== "") {
       newValue = Number(value);
@@ -40,7 +44,7 @@ const CourseCreationForm = () => {
         newValue = 0;
       }
     }
-  
+
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -103,6 +107,7 @@ const CourseCreationForm = () => {
 
       if (response.ok) {
         alert("Course created successfully!");
+        navigate("/")
         setFormData({
           title: "",
           slug: "",
@@ -128,6 +133,50 @@ const CourseCreationForm = () => {
       alert(err.message);
     }
   };
+  const handleFileUpload = async (file) => {
+    try {
+      setUploading(true);
+
+      let finalFile = file;
+
+      // Compress image if needed
+      if (file.type.startsWith("image/")) {
+        const options = {
+          maxSizeMB: 0.5, // 500KB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+        finalFile = await imageCompression(file, options);
+      } else if (file.size > MAX_SIZE_KB * 1024) {
+        alert("File too large! Please keep it under 500KB.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", finalFile);
+
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/upload/course_material`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("File upload failed");
+      }
+
+      const data = await res.json();
+      setCurrentMaterial((prev) => ({
+        ...prev,
+        file_url: data.file_url,
+      }));
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
 
   return (
     <form
@@ -205,7 +254,9 @@ const CourseCreationForm = () => {
 
       {/* Preview Video URL */}
       <div className="mb-4">
-        <label className="block mb-1 font-medium">Preview Video URL (Optional)</label>
+        <label className="block mb-1 font-medium">
+          Preview Video URL (Optional)
+        </label>
         <input
           type="url"
           name="preview_video_url"
@@ -301,7 +352,9 @@ const CourseCreationForm = () => {
 
       {/* Discount Price */}
       <div className="mb-4">
-        <label className="block mb-1 font-medium">Discount Price (Optional)</label>
+        <label className="block mb-1 font-medium">
+          Discount Price (Optional)
+        </label>
         <input
           type="number"
           name="discount_price"
@@ -366,69 +419,85 @@ const CourseCreationForm = () => {
 
       {/* Materials */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Materials</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <input
-            type="text"
-            value={currentMaterial.title}
-            onChange={(e) =>
-              setCurrentMaterial({ ...currentMaterial, title: e.target.value })
-            }
-            placeholder="Title"
-            minLength={2}
-            className="px-3 py-2 border border-gray-300 rounded"
-          />
-          <input
-            type="url"
-            value={currentMaterial.file_url}
-            onChange={(e) =>
-              setCurrentMaterial({
-                ...currentMaterial,
-                file_url: e.target.value,
-              })
-            }
-            placeholder="File URL"
-            className="px-3 py-2 border border-gray-300 rounded"
-          />
-          <select
-            value={currentMaterial.file_type}
-            onChange={(e) =>
-              setCurrentMaterial({
-                ...currentMaterial,
-                file_type: e.target.value,
-              })
-            }
-            className="px-3 py-2 border border-gray-300 rounded"
-          >
-            <option value="pdf">PDF</option>
-            <option value="doc">DOC</option>
-            <option value="image">Image</option>
-          </select>
-        </div>
-        <button
-          type="button"
-          onClick={addMaterial}
-          className="mt-3 px-4 py-2 bg-green-600 text-white rounded"
+      <h3 className="text-lg font-semibold mb-2">Materials</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input
+          type="text"
+          value={currentMaterial.title}
+          onChange={(e) =>
+            setCurrentMaterial({ ...currentMaterial, title: e.target.value })
+          }
+          placeholder="Title"
+          minLength={2}
+          className="px-3 py-2 border border-gray-300 rounded"
+        />
+
+        <select
+          value={currentMaterial.file_type}
+          onChange={(e) =>
+            setCurrentMaterial({
+              ...currentMaterial,
+              file_type: e.target.value,
+            })
+          }
+          className="px-3 py-2 border border-gray-300 rounded"
         >
-          Add Material
-        </button>
-        <ul className="mt-2 space-y-2">
-          {formData.materials.map((mat, i) => (
-            <li key={i} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-              <span>
-                {mat.title} - {mat.file_type}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeMaterial(i)}
-                className="text-red-500 hover:text-red-700"
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
+          <option value="pdf">PDF</option>
+          <option value="doc">DOC</option>
+          <option value="image">Image</option>
+        </select>
+
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) handleFileUpload(file);
+          }}
+          className="px-3 py-2 border border-gray-300 rounded"
+        />
       </div>
+
+      {uploading && (
+        <p className="text-sm text-blue-600 mt-1">Uploading file...</p>
+      )}
+
+      {currentMaterial.file_url && (
+        <p className="text-sm text-green-600 mt-1">
+          ✅ File uploaded successfully!
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={addMaterial}
+        disabled={!currentMaterial.title || !currentMaterial.file_url}
+        className="mt-3 px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+      >
+        Add Material
+      </button>
+
+      <ul className="mt-2 space-y-2">
+        {formData.materials.map((mat, i) => (
+          <li
+            key={i}
+            className="flex justify-between items-center bg-gray-50 p-2 rounded"
+          >
+            <span>
+              {mat.title} - {mat.file_type}
+            </span>
+            <button
+              type="button"
+              onClick={() => removeMaterial(i)}
+              className="text-red-500 hover:text-red-700"
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
 
       <button
         type="submit"

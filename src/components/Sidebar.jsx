@@ -1,6 +1,9 @@
 import { FaHome, FaUsers, FaCog } from "react-icons/fa";
 import { IoClose, IoMenu } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { MdOutlineWork } from "react-icons/md";
+import { PiStudentBold } from "react-icons/pi";
+import { RiLogoutCircleFill } from "react-icons/ri";
 import logo from "../assets/logo.svg";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -12,19 +15,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  const handleLogout = async() => {
-    const res=await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if(res.ok) {
+  const handleLogout = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (res.ok) {
       alert("Logout successful");
-      navigate("/login")
+      navigate("/login");
     }
-  }
+  };
 
   return (
     <>
@@ -120,7 +126,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               }
             `}
           >
-            <FaCog className="text-lg" />
+            <MdOutlineWork className="text-lg" />
             <span>Job Management</span>
           </Link>
           <Link
@@ -136,25 +142,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               }
             `}
           >
-            <FaCog className="text-lg" />
+            <PiStudentBold className="text-lg" />
             <span>Addmission</span>
           </Link>
-          <Link
-            to="/login"
+          <li
             onClick={handleLogout}
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
-                location.pathname === "/admission"
+                location.pathname === "/logout"
                   ? "bg-gray-100 font-medium text-[#00953B]"
                   : "text-gray-700"
               }
             `}
           >
-            <FaCog className="text-lg" />
+            <RiLogoutCircleFill className="text-lg" />
             <span>Logout</span>
-          </Link>
+          </li>
         </nav>
       </div>
     </>
