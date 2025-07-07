@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const CourseCreationForm = () => {
   const MAX_SIZE_KB = 500;
   const [uploading, setUploading] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -36,10 +36,9 @@ const CourseCreationForm = () => {
 
     let newValue = type === "checkbox" ? checked : value;
 
-    // Convert to number if the input type is number and value isn't empty
     if (type === "number" && value !== "") {
       newValue = Number(value);
-      // Ensure we don't set NaN
+
       if (isNaN(newValue)) {
         newValue = 0;
       }
@@ -107,7 +106,7 @@ const CourseCreationForm = () => {
 
       if (response.ok) {
         alert("Course created successfully!");
-        navigate("/")
+        navigate("/");
         setFormData({
           title: "",
           slug: "",
@@ -139,10 +138,10 @@ const CourseCreationForm = () => {
 
       let finalFile = file;
 
-      // 🔽 Compress image files
+      // Compress image if needed
       if (file.type.startsWith("image/")) {
         const options = {
-          maxSizeMB: 0.5,
+          maxSizeMB: 0.5, // 500KB
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
@@ -152,31 +151,35 @@ const CourseCreationForm = () => {
         return;
       }
 
-      const data = new FormData();
-      data.append("file", finalFile);
+      const formData = new FormData();
+      formData.append("file", finalFile);
 
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/upload/course_material`, {
-        method: "POST",
-        credentials: "include",
-        body: data,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/upload/course_material`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        throw new Error("File upload failed");
+      }
 
-      const json = await res.json();
-
-      // ✅ Add just the file_url
-      setFormData((prev) => ({
+      const data = await res.json();
+      setCurrentMaterial((prev) => ({
         ...prev,
-        materials: [...prev.materials, json.file_url],
+        file_url: `${import.meta.env.VITE_BACKEND_URL}${data.file_url}`,
+        
       }));
+      console.log("bhgg",file_url) 
     } catch (err) {
       alert(err.message);
     } finally {
       setUploading(false);
     }
   };
-
 
   return (
     <form
@@ -419,42 +422,85 @@ const CourseCreationForm = () => {
 
       {/* Materials */}
       <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">Materials (max 500KB each)</h3>
+        <h3 className="text-lg font-semibold mb-2">Materials</h3>
 
-      <input
-        type="file"
-        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          if (file) handleFileUpload(file);
-        }}
-        className="px-3 py-2 border border-gray-300 rounded"
-      />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input
+            type="text"
+            value={currentMaterial.title}
+            onChange={(e) =>
+              setCurrentMaterial({ ...currentMaterial, title: e.target.value })
+            }
+            placeholder="Title"
+            minLength={2}
+            className="px-3 py-2 border border-gray-300 rounded"
+          />
 
-      {uploading && (
-        <p className="text-sm text-blue-600 mt-2">Uploading file...</p>
-      )}
-
-      <ul className="mt-4 space-y-2">
-        {formData.materials.map((url, i) => (
-          <li
-            key={i}
-            className="flex justify-between items-center bg-gray-50 p-2 rounded text-sm"
+          <select
+            value={currentMaterial.file_type}
+            onChange={(e) =>
+              setCurrentMaterial({
+                ...currentMaterial,
+                file_type: e.target.value,
+              })
+            }
+            className="px-3 py-2 border border-gray-300 rounded"
           >
-            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline truncate max-w-xs">
-              {url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMaterial(i)}
-              className="text-red-500 hover:text-red-700"
+            <option value="pdf">PDF</option>
+            <option value="doc">DOC</option>
+            <option value="image">Image</option>
+          </select>
+
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) handleFileUpload(file);
+            }}
+            className="px-3 py-2 border border-gray-300 rounded"
+          />
+        </div>
+
+        {uploading && (
+          <p className="text-sm text-blue-600 mt-1">Uploading file...</p>
+        )}
+
+        {currentMaterial.file_url && (
+          <p className="text-sm text-green-600 mt-1">
+            ✅ File uploaded successfully!
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={addMaterial}
+          disabled={!currentMaterial.title || !currentMaterial.file_url}
+          className="mt-3 px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+        >
+          Add Material
+        </button>
+
+        <ul className="mt-2 space-y-2">
+          {formData.materials.map((mat, i) => (
+            <li
+              key={i}
+              className="flex justify-between items-center bg-gray-50 p-2 rounded"
             >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+              <span>
+                {mat.title} - {mat.file_type}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeMaterial(i)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <button
         type="submit"
