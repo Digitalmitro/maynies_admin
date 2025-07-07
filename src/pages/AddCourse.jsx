@@ -68,16 +68,21 @@ const CourseCreationForm = () => {
   };
 
   const addMaterial = () => {
-    if (
-      currentMaterial.title &&
-      currentMaterial.file_url &&
-      currentMaterial.file_type
-    ) {
+    const { title, file_url, file_type } = currentMaterial;
+
+    if (title && file_url && file_type) {
       setFormData((prev) => ({
         ...prev,
         materials: [...prev.materials, currentMaterial],
       }));
-      setCurrentMaterial({ title: "", file_url: "", file_type: "pdf" });
+
+      setCurrentMaterial({
+        title: "",
+        file_url: "",
+        file_type: "pdf",
+      });
+    } else {
+      alert("Please fill in all fields for material.");
     }
   };
 
@@ -90,48 +95,30 @@ const CourseCreationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/courses`,
         {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         }
       );
-
+  
       if (response.ok) {
         alert("Course created successfully!");
-        navigate("/");
-        setFormData({
-          title: "",
-          slug: "",
-          description: "",
-          thumbnail_url: "",
-          instructor_image: "",
-          is_free: false,
-          instructor_name: "",
-          category: "Web Development",
-          language: "English",
-          level: "Intermediate",
-          price: 0,
-          discount_price: 0,
-          tags: [],
-          validity_days: 90,
-          materials: [],
-        });
+        navigate("/")
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create course");
+        const err = await response.json();
+        alert(err.message || "Something went wrong");
       }
     } catch (err) {
-      alert(err.message);
+      alert("Submission failed: " + err.message);
     }
   };
+  
   const handleFileUpload = async (file) => {
     try {
       setUploading(true);
@@ -171,9 +158,8 @@ const CourseCreationForm = () => {
       setCurrentMaterial((prev) => ({
         ...prev,
         file_url: `${import.meta.env.VITE_BACKEND_URL}${data.file_url}`,
-        
       }));
-      console.log("bhgg",file_url) 
+      console.log("bhgg", file_url);
     } catch (err) {
       alert(err.message);
     } finally {
