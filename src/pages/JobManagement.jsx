@@ -30,7 +30,7 @@ function JobManagement() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between  mb-6">
+      <div className="flex justify-between pt-10 mb-6">
         <h2 className="text-2xl font-bold ">Manage Jobs</h2>
         <button className="text-green-500 rounded border cursor-pointer bg-white px-4 font-semibold" onClick={()=>navigate("/createJob")}>
           + create job

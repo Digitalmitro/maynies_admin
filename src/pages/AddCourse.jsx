@@ -132,7 +132,7 @@ const CourseCreationForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow"
+      className="max-w-4xl mx-auto px-6 py-12 md:py-6 bg-white rounded-lg shadow"
     >
       <h2 className="text-2xl font-bold mb-4">Create Course</h2>
 

@@ -1,10 +1,30 @@
 import { FaHome, FaUsers, FaCog } from "react-icons/fa";
 import { IoClose, IoMenu } from "react-icons/io5";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const handleLinkClick = () => {
+    if (window.innerWidth < 768) {
+      toggleSidebar();
+    }
+  };
+
+  const handleLogout = async() => {
+    const res=await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if(res.ok) {
+      alert("Logout successful");
+      navigate("/login")
+    }
+  }
 
   return (
     <>
@@ -41,6 +61,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <Link
             to="/"
+            onClick={handleLinkClick}
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
@@ -57,6 +78,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           <Link
             to="/createCourse"
+            onClick={handleLinkClick}
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
@@ -70,7 +92,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <FaUsers className="text-lg" />
             <span>Create new course</span>
           </Link>
-
           {/* <Link
             to="/settings"
             className={`
@@ -88,6 +109,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </Link> */}
           <Link
             to="/job"
+            onClick={handleLinkClick}
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
@@ -103,6 +125,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </Link>
           <Link
             to="/admission"
+            onClick={handleLinkClick}
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
@@ -115,6 +138,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           >
             <FaCog className="text-lg" />
             <span>Addmission</span>
+          </Link>
+          <Link
+            to="/login"
+            onClick={handleLogout}
+            className={`
+              flex items-center gap-3 p-3 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/admission"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <FaCog className="text-lg" />
+            <span>Logout</span>
           </Link>
         </nav>
       </div>
