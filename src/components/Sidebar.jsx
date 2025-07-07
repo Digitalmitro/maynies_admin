@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
-                location.pathname === "/users"
+                location.pathname === "/createCourse"
                   ? "bg-gray-100 font-medium text-[#00953B]"
                   : "text-gray-700"
               }
@@ -71,7 +71,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <span>Create new course</span>
           </Link>
 
-          <Link
+          {/* <Link
             to="/settings"
             className={`
               flex items-center gap-3 p-3 rounded-lg 
@@ -85,7 +85,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           >
             <FaCog className="text-lg" />
             <span>Instructor Dashboard</span>
-          </Link>
+          </Link> */}
           <Link
             to="/job"
             className={`
@@ -107,7 +107,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
-                location.pathname === "/job"
+                location.pathname === "/admission"
                   ? "bg-gray-100 font-medium text-[#00953B]"
                   : "text-gray-700"
               }

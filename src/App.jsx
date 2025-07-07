@@ -46,7 +46,7 @@ function App() {
           >
             <Route path="/" element={<CourseListing />} />
             <Route path="/createCourse" element={<AddCourse />} />
-            <Route path="/settings" element={<Settings />} />
+            {/* <Route path="/settings" element={<Settings />} /> */}
             <Route path="/job" element={<JobManagement />} />
             <Route path="/job/:slug" element={<JobPage />} />
             <Route path="/createJob" element={<CreateJob />} />
