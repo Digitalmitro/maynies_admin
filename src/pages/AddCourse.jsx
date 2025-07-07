@@ -139,10 +139,10 @@ const CourseCreationForm = () => {
 
       let finalFile = file;
 
-      // Compress image if needed
+      // 🔽 Compress image files
       if (file.type.startsWith("image/")) {
         const options = {
-          maxSizeMB: 0.5, // 500KB
+          maxSizeMB: 0.5,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
@@ -152,23 +152,23 @@ const CourseCreationForm = () => {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", finalFile);
+      const data = new FormData();
+      data.append("file", finalFile);
 
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/upload/course_material`, {
         method: "POST",
         credentials: "include",
-        body: formData,
+        body: data,
       });
 
-      if (!res.ok) {
-        throw new Error("File upload failed");
-      }
+      if (!res.ok) throw new Error("Upload failed");
 
-      const data = await res.json();
-      setCurrentMaterial((prev) => ({
+      const json = await res.json();
+
+      // ✅ Add just the file_url
+      setFormData((prev) => ({
         ...prev,
-        file_url: data.file_url,
+        materials: [...prev.materials, json.file_url],
       }));
     } catch (err) {
       alert(err.message);
@@ -419,74 +419,31 @@ const CourseCreationForm = () => {
 
       {/* Materials */}
       <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">Materials</h3>
+      <h3 className="text-lg font-semibold mb-2">Materials (max 500KB each)</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input
-          type="text"
-          value={currentMaterial.title}
-          onChange={(e) =>
-            setCurrentMaterial({ ...currentMaterial, title: e.target.value })
-          }
-          placeholder="Title"
-          minLength={2}
-          className="px-3 py-2 border border-gray-300 rounded"
-        />
-
-        <select
-          value={currentMaterial.file_type}
-          onChange={(e) =>
-            setCurrentMaterial({
-              ...currentMaterial,
-              file_type: e.target.value,
-            })
-          }
-          className="px-3 py-2 border border-gray-300 rounded"
-        >
-          <option value="pdf">PDF</option>
-          <option value="doc">DOC</option>
-          <option value="image">Image</option>
-        </select>
-
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) handleFileUpload(file);
-          }}
-          className="px-3 py-2 border border-gray-300 rounded"
-        />
-      </div>
+      <input
+        type="file"
+        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) handleFileUpload(file);
+        }}
+        className="px-3 py-2 border border-gray-300 rounded"
+      />
 
       {uploading && (
-        <p className="text-sm text-blue-600 mt-1">Uploading file...</p>
+        <p className="text-sm text-blue-600 mt-2">Uploading file...</p>
       )}
 
-      {currentMaterial.file_url && (
-        <p className="text-sm text-green-600 mt-1">
-          ✅ File uploaded successfully!
-        </p>
-      )}
-
-      <button
-        type="button"
-        onClick={addMaterial}
-        disabled={!currentMaterial.title || !currentMaterial.file_url}
-        className="mt-3 px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-      >
-        Add Material
-      </button>
-
-      <ul className="mt-2 space-y-2">
-        {formData.materials.map((mat, i) => (
+      <ul className="mt-4 space-y-2">
+        {formData.materials.map((url, i) => (
           <li
             key={i}
-            className="flex justify-between items-center bg-gray-50 p-2 rounded"
+            className="flex justify-between items-center bg-gray-50 p-2 rounded text-sm"
           >
-            <span>
-              {mat.title} - {mat.file_type}
-            </span>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline truncate max-w-xs">
+              {url}
+            </a>
             <button
               type="button"
               onClick={() => removeMaterial(i)}
