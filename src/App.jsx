@@ -12,6 +12,7 @@ import JobPage from "./pages/JobPage";
 import CreateJob from "./pages/CreateJob";
 import Addmission from "./pages/Addmission";
 import AdmissionDetails from "./pages/AdmissionDetails";
+import EnrolledStudent from "./pages/EnrolledStudent";
 
 function Layout({ sidebarOpen, setSidebarOpen }) {
   return (
@@ -46,7 +47,7 @@ function App() {
           >
             <Route path="/" element={<CourseListing />} />
             <Route path="/createCourse" element={<AddCourse />} />
-            {/* <Route path="/settings" element={<Settings />} /> */}
+            <Route path="/enrolledStudents" element={<EnrolledStudent />} />
             <Route path="/job" element={<JobManagement />} />
             <Route path="/job/:slug" element={<JobPage />} />
             <Route path="/createJob" element={<CreateJob />} />

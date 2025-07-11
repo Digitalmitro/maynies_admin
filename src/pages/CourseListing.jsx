@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import courseImg from "../assets/courseImg.png";
-import authorImg from "../assets/authorImage.png";
+
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { RiVideoFill } from "react-icons/ri";
-import { FaStar } from "react-icons/fa";
-import CourseFilterDrawer from "../components/CourseFilterDrawer";
 import { useAuth } from "../context/getApi";
+import { useNavigate } from "react-router-dom";
 
 const CourseListing = () => {
   const [courses, setCourses] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeCourseId, setActiveCourseId] = useState(null);
+  const [options, setOptions] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [courseToUpdate, setCourseToUpdate] = useState(null);
+  const navigate = useNavigate();
   const { fetchCourses } = useAuth();
   useEffect(() => {
     const fetchData = async () => {
@@ -22,9 +24,7 @@ const CourseListing = () => {
     };
     fetchData();
   }, []);
-  const handleCourseClick = () => {
-    setDrawerOpen(true);
-  };
+
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
@@ -85,7 +85,10 @@ const CourseListing = () => {
           >
             <div
               className="bg-white rounded-2xl hover:bg-[#FE99001A] overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
-              onClick={() => handleCourseClick(course)}
+              onClick={() => {
+                setOptions((prev) => !prev);
+                setActiveCourseId(course._id);
+              }}
             >
               {/* Delete Button */}
               <button
@@ -98,6 +101,34 @@ const CourseListing = () => {
               >
                 <RiDeleteBin6Line size={18} />
               </button>
+
+              {options && activeCourseId === course._id && (
+                <div className="absolute top-20 right-4 bg-white  rounded shadow z-20 w-40">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCourseToUpdate(course);
+                      setShowUpdateModal(true);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-200"
+                  >
+                    Update Course
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      navigate("/enrolledStudents",{
+                        state: { courseId: course._id }
+                      })
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  >
+                    Enrolled Students
+                  </button>
+                </div>
+              )}
 
               {/* Course Image */}
               <div className="h-48 w-full overflow-hidden">
@@ -195,11 +226,214 @@ const CourseListing = () => {
           </div>
         )}
       </div>
+      {showUpdateModal && courseToUpdate && (
+        <div className="fixed inset-0 z-50 flex  items-center justify-center bg-black/70 bg-opacity-50">
+          <div className="bg-white rounded-lg overflow-y-auto max-h-[600px] shadow-lg w-[90%] max-w-lg p-6 relative">
+            <h2 className="text-xl font-semibold mb-4">Update Course</h2>
 
-      <CourseFilterDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      />
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const response = await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/courses/${
+                      courseToUpdate._id
+                    }`,
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({
+                        price: Number(courseToUpdate.price),
+                        discount_price: Number(courseToUpdate.discount_price),
+                        description: courseToUpdate.description,
+                        tags: courseToUpdate.tags,
+                        materials: courseToUpdate.materials || [],
+                      }),
+                    }
+                  );
+
+                  if (!response.ok) throw new Error("Update failed");
+
+                  alert("Course updated successfully");
+                  setShowUpdateModal(false);
+                  fetchData(); // Refresh course list
+                } catch (err) {
+                  console.error(err);
+                  alert("Failed to update course");
+                }
+              }}
+              className="space-y-4"
+            >
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Price
+                </label>
+                <input
+                  type="number"
+                  value={courseToUpdate.price}
+                  onChange={(e) =>
+                    setCourseToUpdate({
+                      ...courseToUpdate,
+                      price: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border rounded p-2"
+                />
+              </div>
+
+              {/* Discount Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Discount Price
+                </label>
+                <input
+                  type="number"
+                  value={courseToUpdate.discount_price}
+                  onChange={(e) =>
+                    setCourseToUpdate({
+                      ...courseToUpdate,
+                      discount_price: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border rounded p-2"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  value={courseToUpdate.description}
+                  onChange={(e) =>
+                    setCourseToUpdate({
+                      ...courseToUpdate,
+                      description: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border rounded p-2"
+                  rows={3}
+                ></textarea>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={courseToUpdate.tags?.join(", ")}
+                  onChange={(e) =>
+                    setCourseToUpdate({
+                      ...courseToUpdate,
+                      tags: e.target.value.split(",").map((t) => t.trim()),
+                    })
+                  }
+                  className="mt-1 block w-full border rounded p-2"
+                />
+              </div>
+
+              {/* Materials */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Materials
+                </label>
+                {(courseToUpdate.materials || []).map((material, index) => (
+                  <div
+                    key={index}
+                    className="border rounded p-2 mb-2 space-y-2 bg-gray-50"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={material.title}
+                      onChange={(e) => {
+                        const updated = [...courseToUpdate.materials];
+                        updated[index].title = e.target.value;
+                        setCourseToUpdate({
+                          ...courseToUpdate,
+                          materials: updated,
+                        });
+                      }}
+                      className="block w-full border rounded p-1"
+                    />
+                    <input
+                      type="text"
+                      placeholder="File URL"
+                      value={material.file_url}
+                      onChange={(e) => {
+                        const updated = [...courseToUpdate.materials];
+                        updated[index].file_url = e.target.value;
+                        setCourseToUpdate({
+                          ...courseToUpdate,
+                          materials: updated,
+                        });
+                      }}
+                      className="block w-full border rounded p-1"
+                    />
+                    <select
+                      value={material.file_type}
+                      onChange={(e) => {
+                        const updated = [...courseToUpdate.materials];
+                        updated[index].file_type = e.target.value;
+                        setCourseToUpdate({
+                          ...courseToUpdate,
+                          materials: updated,
+                        });
+                      }}
+                      className="block w-full border rounded p-1"
+                    >
+                      <option value="pdf">PDF</option>
+                      <option value="doc">DOC</option>
+                      <option value="video">Video</option>
+                    </select>
+                  </div>
+                ))}
+
+                {/* Add Material Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCourseToUpdate({
+                      ...courseToUpdate,
+                      materials: [
+                        ...(courseToUpdate.materials || []),
+                        { title: "", file_url: "", file_type: "pdf" },
+                      ],
+                    })
+                  }
+                  className="text-blue-600 text-sm mt-2"
+                >
+                  + Add Material
+                </button>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowUpdateModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
