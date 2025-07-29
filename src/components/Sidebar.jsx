@@ -98,21 +98,21 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <FaUsers className="text-lg" />
             <span>Create new course</span>
           </Link>
-          {/* <Link
-            to="/settings"
+          <Link
+            to="/loan"
             className={`
               flex items-center gap-3 p-3 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
-                location.pathname === "/settings"
+                location.pathname === "/loan"
                   ? "bg-gray-100 font-medium text-[#00953B]"
                   : "text-gray-700"
               }
             `}
           >
             <FaCog className="text-lg" />
-            <span>Instructor Dashboard</span>
-          </Link> */}
+            <span>Loan Requests</span>
+          </Link>
           <Link
             to="/job"
             onClick={handleLinkClick}
@@ -144,6 +144,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           >
             <PiStudentBold className="text-lg" />
             <span>Addmission</span>
+          </Link>
+          <Link
+            to="/calender"
+            onClick={handleLinkClick}
+            className={`
+              flex items-center gap-3 p-3 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/calender"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <PiStudentBold className="text-lg" />
+            <span>Acdemic Calender</span>
           </Link>
           <li
             onClick={handleLogout}
