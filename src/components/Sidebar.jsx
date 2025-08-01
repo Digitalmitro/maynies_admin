@@ -69,7 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             to="/"
             onClick={handleLinkClick}
             className={`
-              flex items-center gap-3 p-3 rounded-lg 
+              flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
                 location.pathname === "/"
@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             to="/createCourse"
             onClick={handleLinkClick}
             className={`
-              flex items-center gap-3 p-3 rounded-lg 
+              flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
                 location.pathname === "/createCourse"
@@ -101,7 +101,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <Link
             to="/loan"
             className={`
-              flex items-center gap-3 p-3 rounded-lg 
+              flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
                 location.pathname === "/loan"
@@ -114,10 +114,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <span>Loan Requests</span>
           </Link>
           <Link
+            to="/employeeManagement"
+            onClick={handleLinkClick}
+            className={`
+              flex items-center gap-3 p-2 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/employeeManagement"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <MdOutlineWork className="text-lg" />
+            <span>Employee Management</span>
+          </Link>
+          <Link
             to="/job"
             onClick={handleLinkClick}
             className={`
-              flex items-center gap-3 p-3 rounded-lg 
+              flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
                 location.pathname === "/job"
@@ -133,7 +149,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             to="/admission"
             onClick={handleLinkClick}
             className={`
-              flex items-center gap-3 p-3 rounded-lg 
+              flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
                 location.pathname === "/admission"

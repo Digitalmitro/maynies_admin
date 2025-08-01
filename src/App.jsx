@@ -15,6 +15,8 @@ import AdmissionDetails from "./pages/AdmissionDetails";
 import EnrolledStudent from "./pages/EnrolledStudent";
 import AcdemicCalender from "./pages/AcdemicCalender";
 import Loan from "./pages/Loan";
+import EmployeeManagement from "./pages/EmployeeManagement";
+import EmployeeDetails from "./pages/EmployeeDetails";
 
 function Layout({ sidebarOpen, setSidebarOpen }) {
   return (
@@ -57,6 +59,8 @@ function App() {
             <Route path="/admission/:id" element={<AdmissionDetails />} />
             <Route path="/calender" element={<AcdemicCalender />} />
             <Route path="/loan" element={<Loan />} />
+            <Route path="/employeeManagement" element={<EmployeeManagement />} />
+            <Route path="/employee-details" element={<EmployeeDetails />} />
           </Route>
         </Route>
 
