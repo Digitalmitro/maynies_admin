@@ -18,6 +18,7 @@ function EmployeeManagement() {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
+      console.log(data?.data);
       setEmployees(data?.data || []);
     } catch (error) {
       console.error("Error fetching employees:", error);

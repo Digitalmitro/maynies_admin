@@ -146,20 +146,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <span>Job Management</span>
           </Link>
           <Link
-            to="/admission"
+            to="/student"
             onClick={handleLinkClick}
             className={`
               flex items-center gap-3 p-2 rounded-lg 
               hover:bg-gray-100 transition-colors duration-200
               ${
-                location.pathname === "/admission"
+                location.pathname === "/student"
                   ? "bg-gray-100 font-medium text-[#00953B]"
                   : "text-gray-700"
               }
             `}
           >
             <PiStudentBold className="text-lg" />
-            <span>Addmission</span>
+            <span>Student Management</span>
           </Link>
           <Link
             to="/calender"
