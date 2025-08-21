@@ -60,7 +60,8 @@ function App() {
             <Route path="/student" element={<StudentManagement />} />
             <Route path="/admission" element={<Admission />} />
             <Route path="/admission/:id" element={<AdmissionDetails />} />
-            <Route path="/create-plan" element={<ViewStudentPlans />} />
+            <Route path="/student-plan" element={<ViewStudentPlans />} />
+            <Route path="/create-plan" element={<StudentPlan />} />
             <Route path="/calender" element={<AcdemicCalender />} />
             <Route path="/loan" element={<Loan />} />
             <Route path="/employeeManagement" element={<EmployeeManagement />} />

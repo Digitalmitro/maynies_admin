@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ViewStudentPlans() {
   const [plans, setPlans] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
-
+   const navigate = useNavigate();
   const fetchStudentPlans = async (page = 1) => {
     setLoading(true);
     try {
@@ -33,7 +34,7 @@ function ViewStudentPlans() {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
         <h1 className="text-xl font-bold">Student Plans</h1>
         <button
-          onClick={() => alert("Navigate to create plan page")}
+          onClick={() => navigate("/create-plan")}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Create Plan

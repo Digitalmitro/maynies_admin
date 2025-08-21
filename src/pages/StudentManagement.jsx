@@ -12,7 +12,7 @@ function StudentManagement() {
     {
       title: "Student Plan",
       description: "Set up payment plans",
-      path: "/create-plan"
+      path: "/student-plan"
     }
   ];
 
