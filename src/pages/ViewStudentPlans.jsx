@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 function ViewStudentPlans() {
   const [plans, setPlans] = useState([]);
   const [pagination, setPagination] = useState({});
