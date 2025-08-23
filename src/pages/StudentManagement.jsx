@@ -7,13 +7,23 @@ function StudentManagement() {
     {
       title: "Admission",
       description: "Manage student admissions",
-      path: "/admission"
+      path: "/admission",
     },
     {
       title: "Student Plan",
       description: "Set up payment plans",
-      path: "/student-plan"
-    }
+      path: "/student-plan",
+    },
+    {
+      title: "Student Plan Request",
+      description: " payment Requests  plans",
+      path: "/plan-requests",
+    },
+    {
+      title: "Student Enrolled Plans",
+      description: " Enrolled  plans",
+      path: "/enrolled-plans",
+    },
   ];
 
   return (

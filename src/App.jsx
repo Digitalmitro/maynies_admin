@@ -18,7 +18,10 @@ import EmployeeManagement from "./pages/EmployeeManagement";
 import EmployeeDetails from "./pages/EmployeeDetails";
 import Admission from "./pages/Admission";
 import StudentPlan from "./pages/StudentPlan";
+import StudentPlanRequest from "./pages/StudentPlanRequests";
 import ViewStudentPlans from "./pages/ViewStudentPlans";
+import EnrolledPlans from "./pages/EnrolledPlans";
+import EmployeeFormTemplate from "./pages/EmployeeFormTemplate";
 
 function Layout({ sidebarOpen, setSidebarOpen }) {
   return (
@@ -62,10 +65,13 @@ function App() {
             <Route path="/admission/:id" element={<AdmissionDetails />} />
             <Route path="/student-plan" element={<ViewStudentPlans />} />
             <Route path="/create-plan" element={<StudentPlan />} />
+            <Route path="/plan-requests" element={<StudentPlanRequest />} />
+            <Route path="/enrolled-plans" element={<EnrolledPlans />} />
             <Route path="/calender" element={<AcdemicCalender />} />
             <Route path="/loan" element={<Loan />} />
             <Route path="/employeeManagement" element={<EmployeeManagement />} />
             <Route path="/employee-details" element={<EmployeeDetails />} />
+            <Route path="/employee-Forms" element={<EmployeeFormTemplate />} />
           </Route>
         </Route>
 

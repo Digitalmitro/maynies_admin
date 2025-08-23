@@ -129,6 +129,23 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <MdOutlineWork className="text-lg" />
             <span>Employee Management</span>
           </Link>
+
+             <Link
+            to="/employee-forms"
+            onClick={handleLinkClick}
+            className={`
+              flex items-center gap-3 p-2 rounded-lg 
+              hover:bg-gray-100 transition-colors duration-200
+              ${
+                location.pathname === "/employee-forms"
+                  ? "bg-gray-100 font-medium text-[#00953B]"
+                  : "text-gray-700"
+              }
+            `}
+          >
+            <MdOutlineWork className="text-lg" />
+            <span>Employee Forms </span>
+          </Link>
           <Link
             to="/job"
             onClick={handleLinkClick}

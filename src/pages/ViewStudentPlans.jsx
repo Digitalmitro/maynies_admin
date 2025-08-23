@@ -5,7 +5,7 @@ function ViewStudentPlans() {
   const [plans, setPlans] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
-   const navigate = useNavigate();
+ const navigate = useNavigate();
   const fetchStudentPlans = async (page = 1) => {
     setLoading(true);
     try {
