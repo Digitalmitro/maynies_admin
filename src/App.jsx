@@ -63,8 +63,7 @@ function App() {
             <Route path="/student" element={<StudentManagement />} />
             <Route path="/admission" element={<Admission />} />
             <Route path="/admission/:id" element={<AdmissionDetails />} />
-            <Route path="/student-plan" element={<ViewStudentPlans />} />
-            <Route path="/create-plan" element={<StudentPlan />} />
+            <Route path="/student-plan" element={<StudentPlan />} />
             <Route path="/plan-requests" element={<StudentPlanRequest />} />
             <Route path="/enrolled-plans" element={<EnrolledPlans />} />
             <Route path="/calender" element={<AcdemicCalender />} />

@@ -14,16 +14,16 @@ function StudentManagement() {
       description: "Set up payment plans",
       path: "/student-plan",
     },
-    {
-      title: "Student Plan Request",
-      description: " payment Requests  plans",
-      path: "/plan-requests",
-    },
-    {
-      title: "Student Enrolled Plans",
-      description: " Enrolled  plans",
-      path: "/enrolled-plans",
-    },
+    // {
+    //   title: "Student Plan Request",
+    //   description: " payment Requests  plans",
+    //   path: "/plan-requests",
+    // },
+    // {
+    //   title: "Student Enrolled Plans",
+    //   description: " Enrolled  plans",
+    //   path: "/enrolled-plans",
+    // },
   ];
 
   return (

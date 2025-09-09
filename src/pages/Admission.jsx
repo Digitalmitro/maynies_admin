@@ -4,35 +4,46 @@ import { useNavigate } from "react-router-dom";
 function Admission() {
   const [admissions, setAdmissions] = useState([]);
   const [statuses, setStatuses] = useState({});
-  const [loading, setLoading] = useState(true); // Loader state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // ✅ Error state
   const navigate = useNavigate();
 
   const statusOptions = ["pending", "approved", "rejected"];
 
-  useEffect(() => {
-    const fetchAdmissions = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/student/admission/all`,
-          {
-            credentials: "include",
-          }
-        );
-        const data = await res.json();
-        setAdmissions(data?.admission || []);
+  const fetchAdmissions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const initialStatuses = {};
-        data?.admission?.forEach((item) => {
-          initialStatuses[item._id] = item.status;
-        });
-        setStatuses(initialStatuses);
-      } catch (err) {
-        console.error("Error fetching admissions:", err);
-      } finally {
-        setLoading(false);
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/student/admission/all`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch admissions");
       }
-    };
+
+      setAdmissions(data?.admission || []);
+
+      const initialStatuses = {};
+      data?.admission?.forEach((item) => {
+        initialStatuses[item._id] = item.status;
+      });
+      setStatuses(initialStatuses);
+    } catch (err) {
+      console.error("Error fetching admissions:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAdmissions();
   }, []);
 
@@ -60,7 +71,8 @@ function Admission() {
       );
 
       if (!res.ok) {
-        throw new Error("Failed to update status");
+        const result = await res.json();
+        throw new Error(result.message || "Failed to update status");
       }
 
       const result = await res.json();
@@ -79,6 +91,19 @@ function Admission() {
         // Loader
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
+        </div>
+      ) : error ? (
+        // ✅ Error State
+        <div className="flex flex-col items-center justify-center py-10">
+          <p className="text-red-600 font-medium mb-4">{error}</p>
+          {error.includes("Invalid or expired refresh token") && (
+            <button
+              onClick={fetchAdmissions}
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow"
+            >
+              Refresh
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">
